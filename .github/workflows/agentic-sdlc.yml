@@ -1,0 +1,247 @@
+# Agentic SDLC from Azure Boards — native copy for this app repo (parts-unlimited-web).
+#
+# This is the same workflow shipped in the demo harness, seeded into this repo so you can run it
+# **natively from this repo's Actions tab**. Real end-to-end: read an Azure Boards work item ->
+# create a GitHub issue -> ASSIGN IT TO THE GITHUB COPILOT CODING AGENT (copilot-swe-agent) on the
+# target repo (this repo by default). Copilot creates a branch, implements + tests, and opens a draft
+# PR, which the installed PR-review app reviews.
+#
+# Two modes (workflow_dispatch input `mode`):
+#   - copilot-coding-agent (default): the REAL path. Requires the COPILOT_ASSIGN_PAT secret on THIS
+#     repo (a USER token: fine-grained PAT with Contents/Issues/Pull requests: Read & write — plus
+#     Actions: Read & write — or a classic PAT with `repo`). The built-in GITHUB_TOKEN is
+#     server-to-server and CANNOT start Copilot agent tasks.
+#   - deterministic: offline fallback that edits src/Web with a scripted change (via
+#     .github/agentic/implement.mjs), runs the tests, and opens a draft PR here.
+#
+# Required secrets on this repo: ADO_PAT (read the work item) and, for the real path, COPILOT_ASSIGN_PAT.
+# Prereq for the real path: Copilot coding agent enabled for this repo/org and the PAT user licensed.
+
+name: Agentic SDLC from Azure Boards
+
+on:
+  workflow_dispatch:
+    inputs:
+      ado_work_item_id:
+        description: Azure Boards work item ID to implement
+        required: true
+      ado_org:
+        description: Azure DevOps organization name
+        required: true
+        default: your-ado-org
+      ado_project:
+        description: Azure DevOps project name
+        required: true
+        default: PartsUnlimited
+      github_repo:
+        description: Target GitHub repo (owner/repo). Leave empty to target this repo.
+        required: false
+        default: ''
+      base_ref:
+        description: Base branch Copilot should branch from
+        required: true
+        default: main
+      mode:
+        description: How to implement the work item
+        required: true
+        type: choice
+        default: copilot-coding-agent
+        options:
+          - copilot-coding-agent
+          - deterministic
+      custom_agent:
+        description: 'Optional custom agent to steer Copilot (e.g. feature-implementer). Leave empty for the default agent.'
+        required: false
+        default: ''
+
+permissions:
+  contents: write
+  issues: write
+  pull-requests: write
+
+env:
+  ADO_PAT: ${{ secrets.ADO_PAT }}
+
+jobs:
+  read-workitem:
+    name: Read the Azure Boards work item
+    runs-on: ubuntu-latest
+    outputs:
+      title: ${{ steps.wi.outputs.title }}
+      body_b64: ${{ steps.wi.outputs.body_b64 }}
+    steps:
+      - name: Fetch work item over Azure DevOps REST
+        id: wi
+        shell: bash
+        env:
+          WI_ID: ${{ inputs.ado_work_item_id }}
+          ADO_ORG: ${{ inputs.ado_org }}
+          ADO_PROJECT: ${{ inputs.ado_project }}
+        run: |
+          set -euo pipefail
+          if [ -z "${ADO_PAT:-}" ]; then
+            echo "::error::ADO_PAT secret is required. The source ADO org is MSA-backed, so REST auth must use an Azure DevOps PAT."
+            exit 1
+          fi
+
+          url="https://dev.azure.com/${ADO_ORG}/${ADO_PROJECT}/_apis/wit/workitems/${WI_ID}?api-version=7.0"
+          # MSA-backed Azure DevOps organizations cannot use Entra/AAD tokens here; use Basic auth with base64(':<ADO_PAT>').
+          auth="$(printf ':%s' "$ADO_PAT" | base64 -w0)"
+          json="$(curl -fsS -H "Authorization: Basic ${auth}" -H 'Accept: application/json' "$url")"
+
+          title="$(jq -r '.fields["System.Title"] // "Untitled Azure Boards story"' <<<"$json")"
+          description="$(jq -r '.fields["System.Description"] // "" | gsub("<[^>]*>";"")' <<<"$json")"
+          acceptance="$(jq -r '.fields["Microsoft.VSTS.Common.AcceptanceCriteria"] // "" | gsub("<[^>]*>";"")' <<<"$json")"
+
+          body="$(printf 'Implements Azure Boards work item **AB#%s**.\n\n## Story\n%s\n\n## Description\n%s\n\n## Acceptance criteria\n%s\n\n---\n_Assigned to the GitHub Copilot coding agent by the agentic-sdlc workflow._\n' \
+            "$WI_ID" "$title" "$description" "$acceptance")"
+
+          echo "title=$title" >> "$GITHUB_OUTPUT"
+          echo "body_b64=$(printf '%s' "$body" | base64 -w0)" >> "$GITHUB_OUTPUT"
+
+  copilot-coding-agent:
+    name: Assign the work item to the Copilot coding agent
+    needs: read-workitem
+    if: ${{ inputs.mode == 'copilot-coding-agent' }}
+    runs-on: ubuntu-latest
+    env:
+      # A USER token is mandatory here: the default GITHUB_TOKEN (server-to-server) cannot start Copilot tasks.
+      GH_TOKEN: ${{ secrets.COPILOT_ASSIGN_PAT }}
+      # Default to THIS repo when github_repo is left empty.
+      GH_REPO: ${{ inputs.github_repo || github.repository }}
+    steps:
+      - name: Validate the user token
+        run: |
+          set -euo pipefail
+          if [ -z "${GH_TOKEN:-}" ]; then
+            echo "::error::COPILOT_ASSIGN_PAT (a USER PAT) is required on this repo. The built-in GITHUB_TOKEN is server-to-server and cannot assign the Copilot coding agent. Add a fine-grained PAT with Contents/Issues/Pull requests: Read & write (and Actions: Read & write), or a classic PAT with 'repo'."
+            exit 1
+          fi
+
+      - name: Resolve the repo and the Copilot bot id
+        id: resolve
+        run: |
+          set -euo pipefail
+          owner="${GH_REPO%%/*}"; name="${GH_REPO##*/}"
+          q='query($owner:String!,$name:String!){repository(owner:$owner,name:$name){id suggestedActors(capabilities:[CAN_BE_ASSIGNED],first:100){nodes{login __typename ... on Bot{id} ... on User{id}}}}}'
+          resp="$(gh api graphql -f query="$q" -f owner="$owner" -f name="$name")"
+          repo_id="$(jq -r '.data.repository.id' <<<"$resp")"
+          bot_id="$(jq -r '.data.repository.suggestedActors.nodes[] | select(.login=="copilot-swe-agent") | .id' <<<"$resp")"
+          if [ -z "$bot_id" ] || [ "$bot_id" = "null" ]; then
+            echo "::error::The Copilot coding agent is not assignable on ${GH_REPO}. Enable Copilot coding agent for the repo/org and ensure the PAT user has a Copilot license."
+            exit 1
+          fi
+          echo "repo_id=$repo_id" >> "$GITHUB_OUTPUT"
+          echo "bot_id=$bot_id" >> "$GITHUB_OUTPUT"
+
+      - name: Create the issue and assign Copilot
+        env:
+          WI_ID: ${{ inputs.ado_work_item_id }}
+          BASE_REF: ${{ inputs.base_ref }}
+          CUSTOM_AGENT: ${{ inputs.custom_agent }}
+          TITLE: ${{ needs.read-workitem.outputs.title }}
+          BODY_B64: ${{ needs.read-workitem.outputs.body_b64 }}
+          REPO_ID: ${{ steps.resolve.outputs.repo_id }}
+          BOT_ID: ${{ steps.resolve.outputs.bot_id }}
+        run: |
+          set -euo pipefail
+          body="$(printf '%s' "$BODY_B64" | base64 -d)"
+          ci="Implement AB#${WI_ID} on the .NET 8 app in src/Web and add a matching xUnit test in src/Web.Tests. Follow AGENTS.md and .github/instructions; open a draft PR whose body links AB#${WI_ID}."
+
+          # GraphQL variables (never string-interpolated) keep the work-item text injection-safe.
+          m='mutation($repoId:ID!,$title:String!,$body:String!,$botId:ID!,$baseRef:String!,$ci:String!,$ca:String!,$model:String!){createIssue(input:{repositoryId:$repoId,title:$title,body:$body,assigneeIds:[$botId],agentAssignment:{targetRepositoryId:$repoId,baseRef:$baseRef,customInstructions:$ci,customAgent:$ca,model:$model}}){issue{number url}}}'
+
+          resp="$(gh api graphql \
+            -H 'GraphQL-Features: issues_copilot_assignment_api_support,coding_agent_model_selection' \
+            -f query="$m" \
+            -f repoId="$REPO_ID" \
+            -f title="$TITLE" \
+            -f body="$body" \
+            -f botId="$BOT_ID" \
+            -f baseRef="$BASE_REF" \
+            -f ci="$ci" \
+            -f ca="$CUSTOM_AGENT" \
+            -f model="")"
+
+          num="$(jq -r '.data.createIssue.issue.number' <<<"$resp")"
+          url="$(jq -r '.data.createIssue.issue.url' <<<"$resp")"
+          if [ -z "$url" ] || [ "$url" = "null" ]; then
+            echo "::error::Failed to create/assign the issue. Response: $resp"
+            exit 1
+          fi
+          echo "Assigned the Copilot coding agent to issue #$num: $url"
+
+          {
+            echo "### Agentic SDLC — Copilot coding agent"
+            echo ""
+            echo "- **Work item:** AB#${WI_ID} — ${TITLE}"
+            echo "- **Issue assigned to Copilot:** ${url}"
+            echo "- **Target repo:** ${GH_REPO} (base \`${BASE_REF}\`)"
+            echo "- Copilot will create a branch, implement + test, and open a **draft PR**; the PR-review app reviews it."
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  deterministic-fallback:
+    name: Deterministic fallback (offline demo)
+    needs: read-workitem
+    if: ${{ inputs.mode == 'deterministic' }}
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+      WORK_ITEM_ID: ${{ inputs.ado_work_item_id }}
+      WORK_ITEM_TITLE: ${{ needs.read-workitem.outputs.title }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Create implementation branch
+        run: |
+          set -euo pipefail
+          slug="$(printf '%s' "$WORK_ITEM_TITLE" \
+            | tr '[:upper:]' '[:lower:]' \
+            | sed -E 's/[^a-z0-9]+/-/g; s/^-+//; s/-+$//; s/-+/-/g' \
+            | cut -c1-48)"
+          [ -z "$slug" ] && slug="story"
+          branch="feature/AB${WORK_ITEM_ID}-${slug}"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git switch -c "$branch"
+          echo "BRANCH_NAME=$branch" >> "$GITHUB_ENV"
+
+      - name: Run the scripted coder/tester step
+        run: |
+          set -euo pipefail
+          node .github/agentic/implement.mjs
+          dotnet test src/Web.Tests/Web.Tests.csproj --nologo
+
+      - name: Commit implementation
+        run: |
+          set -euo pipefail
+          git add src
+          if git diff --cached --quiet; then
+            echo "::error::No implementation changes were produced by the scripted coder/tester step."
+            exit 1
+          fi
+          git commit -m "Implement AB#${WORK_ITEM_ID}: ${WORK_ITEM_TITLE}"
+          git push --set-upstream origin "$BRANCH_NAME"
+
+      - name: Open a draft PR
+        run: |
+          set -euo pipefail
+          {
+            printf '%s\n\n' "Implements Azure Boards work item AB#${WORK_ITEM_ID} (deterministic offline fallback)."
+            printf '## Story\n%s\n\n' "${WORK_ITEM_TITLE}"
+            printf '## Review handoff\n%s\n' "Opening this draft PR triggers the installed Copilot SDK PR-review app through pull_request events."
+          } > pr_body.md
+          gh pr create \
+            --draft \
+            --base "${{ inputs.base_ref }}" \
+            --head "${BRANCH_NAME}" \
+            --title "AB#${WORK_ITEM_ID}: ${WORK_ITEM_TITLE}" \
+            --body-file pr_body.md
