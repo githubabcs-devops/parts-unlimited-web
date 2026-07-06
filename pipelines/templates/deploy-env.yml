@@ -1,0 +1,67 @@
+# Reusable deploy stage: provisions the App Service for one environment (Bicep) and deploys the app.
+# Used by pipelines/azure-pipelines.yml for dev, qa and prod.
+parameters:
+  - name: stageName
+    type: string
+  - name: environmentName # dev | qa | prod (drives Bicep + app settings)
+    type: string
+  - name: adoEnvironment # ADO Environment name — approvals/checks are configured here
+    type: string
+  - name: azureServiceConnection
+    type: string
+  - name: resourceGroup
+    type: string
+  - name: location
+    type: string
+    default: eastus
+  - name: sku
+    type: string
+    default: B1
+  - name: appBaseName
+    type: string
+    default: gh-ado-e2e-demo
+  - name: dependsOn
+    type: object
+    default: []
+
+stages:
+  - stage: ${{ parameters.stageName }}
+    displayName: Deploy ${{ parameters.environmentName }}
+    dependsOn: ${{ parameters.dependsOn }}
+    jobs:
+      - deployment: deploy_${{ parameters.environmentName }}
+        displayName: Deploy to ${{ parameters.environmentName }}
+        pool:
+          vmImage: ubuntu-latest
+        # Approvals and gates are configured on this ADO Environment.
+        environment: ${{ parameters.adoEnvironment }}
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - checkout: self # needed for infra/main.bicep
+                - download: current
+                  artifact: app
+                - task: AzureCLI@2
+                  displayName: Provision App Service (Bicep) — ${{ parameters.environmentName }}
+                  inputs:
+                    azureSubscription: ${{ parameters.azureServiceConnection }}
+                    scriptType: bash
+                    scriptLocation: inlineScript
+                    inlineScript: |
+                      set -euo pipefail
+                      az group create -n "${{ parameters.resourceGroup }}" -l "${{ parameters.location }}" 1>/dev/null
+                      appName=$(az deployment group create \
+                        -g "${{ parameters.resourceGroup }}" \
+                        -f "$(Build.SourcesDirectory)/infra/main.bicep" \
+                        -p appBaseName="${{ parameters.appBaseName }}" environmentName="${{ parameters.environmentName }}" location="${{ parameters.location }}" sku="${{ parameters.sku }}" \
+                        --query "properties.outputs.appServiceName.value" -o tsv)
+                      echo "Provisioned web app: $appName"
+                      echo "##vso[task.setvariable variable=webAppName]$appName"
+                - task: AzureWebApp@1
+                  displayName: Deploy package — ${{ parameters.environmentName }}
+                  inputs:
+                    azureSubscription: ${{ parameters.azureServiceConnection }}
+                    appType: webAppLinux
+                    appName: $(webAppName)
+                    package: $(Pipeline.Workspace)/app/app.zip

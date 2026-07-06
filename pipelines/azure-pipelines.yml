@@ -1,0 +1,85 @@
+# Phase 1: Azure Pipelines builds the .NET web app FROM the GitHub repo and deploys it across
+# THREE environments (Dev -> QA -> Prod) to Azure App Service. Modeled on CICD-webapp-dotnet (def 72).
+# Phase 2 (roadmap): a GitHub Actions equivalent.
+#
+# ARM (Azure) service connections are reused via Workload Identity Federation, one per tier:
+#   azureServiceConnectionNonProd : Dev + QA   (default 'NonProd-VSESubscription')
+#   azureServiceConnectionProd    : Prod        (default 'Prod-VSESubscription')
+# Override them in Pipeline -> Edit -> Variables (or a variable group) if your names differ.
+# The deploy stages reference ADO Environments 'Dev', 'QA', 'Prod' — add approvals/checks there
+# (or change 'adoEnvironment' below to your existing environments, e.g. Dev-Yaml / QA-Yaml / Prod-Yaml).
+
+trigger:
+  branches:
+    include:
+      - main
+
+variables:
+  azureServiceConnectionNonProd: 'NonProd-VSESubscription' # ARM (WIF) — Dev + QA
+  azureServiceConnectionProd: 'Prod-VSESubscription'       # ARM (WIF) — Prod
+  appBaseName: 'gh-ado-e2e-demo'
+  location: 'eastus'
+  buildConfiguration: 'Release'
+
+stages:
+  - stage: Build
+    displayName: Build & test
+    jobs:
+      - job: build
+        pool:
+          vmImage: ubuntu-latest
+        steps:
+          - checkout: self
+          - task: UseDotNet@2
+            inputs:
+              packageType: sdk
+              version: 8.0.x
+          - script: dotnet test src/Web.Tests/Web.Tests.csproj --configuration $(buildConfiguration) --logger trx
+            displayName: Build & test
+          - script: dotnet publish src/Web/Web.csproj --configuration $(buildConfiguration) -o "$(Build.ArtifactStagingDirectory)/publish"
+            displayName: Publish
+          - task: ArchiveFiles@2
+            displayName: Zip published output
+            inputs:
+              rootFolderOrFile: '$(Build.ArtifactStagingDirectory)/publish'
+              includeRootFolder: false
+              archiveType: zip
+              archiveFile: '$(Build.ArtifactStagingDirectory)/app.zip'
+          - publish: '$(Build.ArtifactStagingDirectory)/app.zip'
+            artifact: app
+
+  - template: templates/deploy-env.yml
+    parameters:
+      stageName: Deploy_Dev
+      environmentName: dev
+      adoEnvironment: 'Dev'
+      azureServiceConnection: $(azureServiceConnectionNonProd)
+      resourceGroup: 'rg-$(appBaseName)-dev'
+      location: $(location)
+      sku: 'B1'
+      appBaseName: $(appBaseName)
+      dependsOn: [Build]
+
+  - template: templates/deploy-env.yml
+    parameters:
+      stageName: Deploy_QA
+      environmentName: qa
+      adoEnvironment: 'QA'
+      azureServiceConnection: $(azureServiceConnectionNonProd)
+      resourceGroup: 'rg-$(appBaseName)-qa'
+      location: $(location)
+      sku: 'B1'
+      appBaseName: $(appBaseName)
+      dependsOn: [Deploy_Dev]
+
+  - template: templates/deploy-env.yml
+    parameters:
+      stageName: Deploy_Prod
+      environmentName: prod
+      adoEnvironment: 'Prod'
+      azureServiceConnection: $(azureServiceConnectionProd)
+      resourceGroup: 'rg-$(appBaseName)-prod'
+      location: $(location)
+      sku: 'P1v3'
+      appBaseName: $(appBaseName)
+      dependsOn: [Deploy_QA]

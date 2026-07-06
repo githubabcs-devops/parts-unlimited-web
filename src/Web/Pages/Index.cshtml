@@ -1,0 +1,21 @@
+@page
+@model IndexModel
+@using GhAdoE2eDemo.Web
+@{
+    ViewData["Title"] = "Home";
+}
+
+<section aria-labelledby="hero-heading">
+    <h1 id="hero-heading">@HomeContent.HeroBanner</h1>
+    <p>An end-to-end demo of moving from Azure DevOps to GitHub.</p>
+</section>
+
+<section aria-labelledby="whatsnew-heading">
+    <h2 id="whatsnew-heading">What's New</h2>
+    <ul>
+        @foreach (var item in HomeContent.Highlights)
+        {
+            <li>@item</li>
+        }
+    </ul>
+</section>

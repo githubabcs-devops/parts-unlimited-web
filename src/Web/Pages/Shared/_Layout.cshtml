@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Parts Unlimited</title>
+</head>
+<body>
+    <main role="main">
+        @RenderBody()
+    </main>
+    <footer>
+        @* User Story: "Refresh the footer with the current year and key links" (year is dynamic). *@
+        <p>&copy; @DateTime.UtcNow.Year Parts Unlimited &middot;
+            <a href="/privacy">Privacy</a> &middot;
+            <a href="/contact">Contact</a>
+        </p>
+    </footer>
+</body>
+</html>
