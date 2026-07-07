@@ -23,11 +23,18 @@ parameters:
   - name: dependsOn
     type: object
     default: []
+  - name: condition
+    type: string
+    default: ''
 
 stages:
   - stage: ${{ parameters.stageName }}
     displayName: Deploy ${{ parameters.environmentName }}
     dependsOn: ${{ parameters.dependsOn }}
+    # When a condition is supplied (e.g. main-branch only), apply it; otherwise keep the default
+    # behaviour (runs when the stage dependencies succeed).
+    ${{ if ne(parameters.condition, '') }}:
+      condition: ${{ parameters.condition }}
     jobs:
       - deployment: deploy_${{ parameters.environmentName }}
         displayName: Deploy to ${{ parameters.environmentName }}

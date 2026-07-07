@@ -29,6 +29,9 @@ stages:
         pool:
           vmImage: ubuntu-latest
         steps:
+          # 'self' = the repository this pipeline is bound to = the GitHub repo
+          # (githubabcs-devops/parts-unlimited-web, type: GitHub). It is NOT the ADO repo of the
+          # same name — the pipeline was created with --repository-type github, so self resolves to GitHub.
           - checkout: self
           - task: UseDotNet@2
             inputs:
@@ -48,6 +51,8 @@ stages:
           - publish: '$(Build.ArtifactStagingDirectory)/app.zip'
             artifact: app
 
+  # Deploy stages run only when building 'main' (i.e. after merge). On pull-request validation builds
+  # the deploy stages are skipped, so PRs run Build & test only and never hit the Prod environment check.
   - template: templates/deploy-env.yml
     parameters:
       stageName: Deploy_Dev
@@ -59,6 +64,7 @@ stages:
       sku: 'B1'
       appBaseName: $(appBaseName)
       dependsOn: [Build]
+      condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
 
   - template: templates/deploy-env.yml
     parameters:
@@ -71,6 +77,7 @@ stages:
       sku: 'B1'
       appBaseName: $(appBaseName)
       dependsOn: [Deploy_Dev]
+      condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
 
   - template: templates/deploy-env.yml
     parameters:
@@ -83,3 +90,4 @@ stages:
       sku: 'P1v3'
       appBaseName: $(appBaseName)
       dependsOn: [Deploy_QA]
+      condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
