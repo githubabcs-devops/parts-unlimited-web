@@ -5,6 +5,31 @@
     ViewData["Title"] = "Home";
 }
 
+<style>
+    .whats-new-list {
+        display: grid;
+        gap: 1rem;
+        grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+        list-style: none;
+        margin: 0;
+        padding: 0;
+    }
+
+    .whats-new-item {
+        border: 1px solid #d0d7de;
+        border-radius: 0.75rem;
+        padding: 1rem;
+    }
+
+    .whats-new-item h3 {
+        margin-top: 0;
+    }
+
+    .whats-new-item p {
+        margin-bottom: 0;
+    }
+</style>
+
 <section aria-labelledby="hero-heading">
     <h1 id="hero-heading">@HomeContent.HeroBanner</h1>
     <p>An end-to-end demo of moving from Azure DevOps to GitHub.</p>
@@ -12,10 +37,14 @@
 
 <section aria-labelledby="whatsnew-heading">
     <h2 id="whatsnew-heading">What's New</h2>
-    <ul>
+    <p>Recent improvements from the Parts Unlimited storefront demo.</p>
+    <ul class="whats-new-list">
         @foreach (var item in HomeContent.Highlights)
         {
-            <li>@item</li>
+            <li class="whats-new-item">
+                <h3>@item.Title</h3>
+                <p>@item.Description</p>
+            </li>
         }
     </ul>
 </section>

@@ -17,4 +17,14 @@ public class HomeContentTests
     {
         Assert.NotEmpty(HomeContent.Highlights);
     }
+
+    [Fact]
+    public void Highlights_have_titles_and_descriptions()
+    {
+        Assert.All(HomeContent.Highlights, highlight =>
+        {
+            Assert.False(string.IsNullOrWhiteSpace(highlight.Title));
+            Assert.False(string.IsNullOrWhiteSpace(highlight.Description));
+        });
+    }
 }
