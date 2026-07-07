@@ -6,7 +6,7 @@ namespace GhAdoE2eDemo.Web;
 /// </summary>
 public static class HomeContent
 {
-    public const string Title = "Welcome to Parts Unlimited v2";
+    public const string Title = "Welcome to Parts Unlimited v3.1";
 
     public const string HeroMessage = "Now powered by GitHub Copilot (GHCP)";
 
