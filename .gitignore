@@ -1,0 +1,10 @@
+## Visual Studio and .NET build outputs
+.vs/
+[Bb]in/
+[Oo]bj/
+[Tt]est[Rr]esult*/
+
+## Visual Studio user-specific files
+*.user
+*.rsuser
+*.suo
