@@ -8,7 +8,7 @@ public static class HomeContent
 {
     public const string Title = "Welcome to Parts Unlimited v2";
 
-    public const string HeroMessage = "Now powered by GitHub Copilot";
+    public const string HeroMessage = "Now powered by GitHub Copilot (GHCP)";
 
     // User Story: "Add a 'What's New' highlights section to the home page".
     public static readonly IReadOnlyList<string> Highlights = new[]
