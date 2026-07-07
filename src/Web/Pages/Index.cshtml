@@ -12,10 +12,14 @@
 
 <section aria-labelledby="whatsnew-heading">
     <h2 id="whatsnew-heading">What's New</h2>
-    <ul>
+    <p>Recent improvements from the Parts Unlimited storefront demo.</p>
+    <ul class="whats-new-list">
         @foreach (var item in HomeContent.Highlights)
         {
-            <li>@item</li>
+            <li class="whats-new-item">
+                <h3>@item.Title</h3>
+                <p>@item.Description</p>
+            </li>
         }
     </ul>
 </section>

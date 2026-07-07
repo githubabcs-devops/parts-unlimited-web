@@ -10,12 +10,21 @@ public static class HomeContent
     public const string HeroBanner = "Welcome to Parts Unlimited - now powered by GitHub Copilot";
 
     // User Story: "Add a 'What's New' highlights section to the home page".
-    public static readonly IReadOnlyList<string> Highlights = new[]
+    public static readonly IReadOnlyList<HomeHighlight> Highlights = new[]
     {
-        "See the latest updates in the What is New section",
-        "Migrated from Azure DevOps to GitHub with full history and pull requests",
-        "AI-assisted code review on every pull request",
-        "Automated CI/CD to Azure App Service across Dev, QA and Prod",
+        new HomeHighlight(
+            "Fresh home page highlights",
+            "See the latest storefront updates in a short, scannable section."),
+        new HomeHighlight(
+            "GitHub-powered delivery",
+            "Track work from pull requests through automated builds, tests, and deployments."),
+        new HomeHighlight(
+            "AI-assisted reviews",
+            "Catch issues early with automated review feedback on every proposed change."),
+        new HomeHighlight(
+            "Reliable releases",
+            "Promote changes through Dev, QA, and Prod with the same delivery workflow."),
     };
 }
 
+public sealed record HomeHighlight(string Title, string Description);
