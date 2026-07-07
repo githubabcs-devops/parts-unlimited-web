@@ -6,8 +6,10 @@ namespace GhAdoE2eDemo.Web;
 /// </summary>
 public static class HomeContent
 {
+    public const string Title = "Welcome to Parts Unlimited v2";
+
     // User Story: "Update the home page hero banner text".
-    public const string HeroBanner = "Welcome to Parts Unlimited - now powered by GitHub Copilot";
+    public const string HeroBanner = Title;
 
     // User Story: "Add a 'What's New' highlights section to the home page".
     public static readonly IReadOnlyList<string> Highlights = new[]
@@ -18,4 +20,3 @@ public static class HomeContent
         "Automated CI/CD to Azure App Service across Dev, QA and Prod",
     };
 }
-
