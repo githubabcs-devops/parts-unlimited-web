@@ -1,0 +1,298 @@
+/* Parts Unlimited — site stylesheet
+   Design inspired by microsoft.com: dark header, blue accent, white body, Segoe UI typography.
+   All color tokens are defined here as CSS custom properties and used throughout. */
+
+/* ─── Tokens ─────────────────────────────────────────────────────────────── */
+:root {
+    /* Header / navigation */
+    --pu-header-bg:     #1b1b1b;
+    --pu-header-text:   #ffffff;
+
+    /* Brand accent — Microsoft blue */
+    --pu-blue:          #0067b8;
+    --pu-blue-hover:    #005da6;
+    --pu-blue-light:    #e6f0fa;
+
+    /* Page surface */
+    --pu-bg:            #ffffff;
+    --pu-bg-alt:        #f5f5f5;
+
+    /* Typography */
+    --pu-ink:           #1b1b1b;
+    --pu-muted:         #6e6e6e;
+
+    /* Cards / borders */
+    --pu-surface:       #ffffff;
+    --pu-border:        #d1d1d1;
+    --pu-radius:        4px;
+    --pu-shadow:        0 4px 16px rgba(0, 0, 0, 0.10);
+
+    /* Footer */
+    --pu-footer-bg:     #1b1b1b;
+    --pu-footer-text:   #c8c8c8;
+}
+
+/* ─── Reset ──────────────────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+    margin: 0;
+    font-family: "Segoe UI", system-ui, -apple-system, Roboto, Helvetica, Arial, sans-serif;
+    font-size: 1rem;
+    line-height: 1.6;
+    color: var(--pu-ink);
+    background: var(--pu-bg);
+    -webkit-font-smoothing: antialiased;
+}
+
+a { color: var(--pu-blue); }
+
+/* ─── Container ─────────────────────────────────────────────────────────── */
+.container {
+    width: min(1200px, 92vw);
+    margin: 0 auto;
+    padding: 1rem 0;
+}
+
+/* ─── Header ─────────────────────────────────────────────────────────────── */
+.site-header {
+    background: var(--pu-header-bg);
+    color: var(--pu-header-text);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.10);
+}
+
+.site-header .container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding-top: 0.6rem;
+    padding-bottom: 0.6rem;
+}
+
+/* Brand */
+.brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.65rem;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--pu-header-text);
+    text-decoration: none;
+    letter-spacing: 0.15px;
+}
+
+.brand-mark {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    border-radius: var(--pu-radius);
+    background: var(--pu-blue);
+    color: #ffffff;
+    font-weight: 700;
+    font-size: 0.85rem;
+    letter-spacing: 0;
+}
+
+/* Primary nav */
+.site-nav a {
+    color: rgba(255, 255, 255, 0.85);
+    text-decoration: none;
+    margin-left: 1.5rem;
+    font-size: 0.9rem;
+    font-weight: 400;
+    transition: color 0.12s ease;
+}
+
+.site-nav a:hover { color: var(--pu-header-text); }
+
+/* ─── Main ───────────────────────────────────────────────────────────────── */
+main { padding-bottom: 4rem; }
+
+/* ─── Hero ───────────────────────────────────────────────────────────────── */
+.hero {
+    background: var(--pu-header-bg);
+    color: var(--pu-header-text);
+    position: relative;
+    overflow: hidden;
+}
+
+/* Subtle blue accent glow */
+.hero::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(120deg, rgba(0, 103, 184, 0.35) 0%, transparent 65%);
+    pointer-events: none;
+}
+
+.hero .container {
+    padding-top: 5rem;
+    padding-bottom: 5rem;
+    position: relative;
+    z-index: 1;
+}
+
+.hero .eyebrow {
+    display: inline-block;
+    font-size: 0.78rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--pu-blue-light);
+    background: rgba(0, 103, 184, 0.30);
+    border: 1px solid rgba(0, 103, 184, 0.50);
+    padding: 0.3rem 0.8rem;
+    border-radius: 2px;
+    margin-bottom: 1.2rem;
+}
+
+.hero h1 {
+    margin: 0 0 1rem;
+    font-size: clamp(2rem, 4vw, 3.2rem);
+    font-weight: 600;
+    line-height: 1.15;
+    max-width: 20ch;
+    color: var(--pu-header-text);
+}
+
+.hero p {
+    margin: 0 0 2rem;
+    font-size: 1.1rem;
+    color: rgba(255, 255, 255, 0.75);
+    max-width: 50ch;
+}
+
+/* ─── Buttons ────────────────────────────────────────────────────────────── */
+.btn {
+    display: inline-block;
+    padding: 0.75rem 1.5rem;
+    border-radius: var(--pu-radius);
+    font-size: 0.95rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: background 0.12s ease, transform 0.05s ease;
+}
+
+.btn:active { transform: translateY(1px); }
+
+.btn-primary {
+    background: var(--pu-blue);
+    color: #ffffff;
+}
+
+.btn-primary:hover { background: var(--pu-blue-hover); color: #ffffff; }
+
+/* ─── What's New section ─────────────────────────────────────────────────── */
+.whatsnew {
+    padding: 3.5rem 0 1rem;
+    background: var(--pu-bg-alt);
+}
+
+.section-head { margin-bottom: 2rem; }
+
+.section-head h2 {
+    margin: 0 0 0.4rem;
+    font-size: 1.75rem;
+    font-weight: 600;
+    color: var(--pu-ink);
+}
+
+.section-head p {
+    margin: 0;
+    color: var(--pu-muted);
+    font-size: 1rem;
+}
+
+/* ─── Highlight cards ────────────────────────────────────────────────────── */
+.cards {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+}
+
+.card {
+    background: var(--pu-surface);
+    border: 1px solid var(--pu-border);
+    border-radius: var(--pu-radius);
+    box-shadow: var(--pu-shadow);
+    padding: 1.5rem;
+    border-top: 3px solid var(--pu-blue);
+    transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.14);
+}
+
+.card .card-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: var(--pu-radius);
+    background: var(--pu-blue-light);
+    color: var(--pu-blue);
+    font-weight: 700;
+    font-size: 0.9rem;
+    margin-bottom: 0.85rem;
+}
+
+.card p {
+    margin: 0;
+    color: var(--pu-ink);
+    font-size: 0.95rem;
+    line-height: 1.55;
+}
+
+/* ─── Footer ─────────────────────────────────────────────────────────────── */
+.footer {
+    background: var(--pu-footer-bg);
+    color: var(--pu-footer-text);
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.footer .container {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    padding-top: 1.5rem;
+    padding-bottom: 1.5rem;
+    font-size: 0.875rem;
+}
+
+.footer a {
+    color: var(--pu-footer-text);
+    text-decoration: none;
+    transition: color 0.12s ease;
+}
+
+.footer a:hover { color: #ffffff; }
+
+/* ─── Responsive ─────────────────────────────────────────────────────────── */
+@media (max-width: 640px) {
+    .site-header .container {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+
+    .site-nav a {
+        margin-left: 0;
+        margin-right: 1.2rem;
+    }
+}

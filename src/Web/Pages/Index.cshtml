@@ -5,17 +5,29 @@
     ViewData["Title"] = "Home";
 }
 
-<section aria-labelledby="hero-heading">
-    <h1 id="hero-heading">@HomeContent.HeroBanner</h1>
-    <p>An end-to-end demo of moving from Azure DevOps to GitHub.</p>
+<section class="hero" aria-labelledby="hero-heading">
+    <div class="container">
+        <span class="eyebrow">Parts Unlimited</span>
+        <h1 id="hero-heading">@HomeContent.HeroBanner</h1>
+        <p>An end-to-end demo of moving from Azure DevOps to GitHub.</p>
+        <a class="btn btn-primary" href="#whatsnew-section">See what's new</a>
+    </div>
 </section>
 
-<section aria-labelledby="whatsnew-heading">
-    <h2 id="whatsnew-heading">What's New</h2>
-    <ul>
-        @foreach (var item in HomeContent.Highlights)
-        {
-            <li>@item</li>
-        }
-    </ul>
+<section class="whatsnew" id="whatsnew-section" aria-labelledby="whatsnew-heading">
+    <div class="container">
+        <div class="section-head">
+            <h2 id="whatsnew-heading">What's New</h2>
+            <p>The latest improvements powering the Parts Unlimited storefront.</p>
+        </div>
+        <ul class="cards">
+            @for (var i = 0; i < HomeContent.Highlights.Count; i++)
+            {
+                <li class="card">
+                    <span class="card-icon" aria-hidden="true">@(i + 1)</span>
+                    <p>@HomeContent.Highlights[i]</p>
+                </li>
+            }
+        </ul>
+    </div>
 </section>
