@@ -64,7 +64,7 @@ stages:
       sku: 'B1'
       appBaseName: $(appBaseName)
       dependsOn: [Build]
-      condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
+      condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
 
   - template: templates/deploy-env.yml
     parameters:
@@ -77,7 +77,7 @@ stages:
       sku: 'B1'
       appBaseName: $(appBaseName)
       dependsOn: [Deploy_Dev]
-      condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
+      condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
 
   - template: templates/deploy-env.yml
     parameters:
@@ -90,4 +90,4 @@ stages:
       sku: 'P1v3'
       appBaseName: $(appBaseName)
       dependsOn: [Deploy_QA]
-      condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
+      condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
