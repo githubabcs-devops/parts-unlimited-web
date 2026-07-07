@@ -10,6 +10,27 @@
     <p>An end-to-end demo of moving from Azure DevOps to GitHub.</p>
 </section>
 
+@if (Model.ShowCookieConsentBanner)
+{
+    <section id="cookie-consent-banner" aria-labelledby="cookie-consent-heading">
+        <h2 id="cookie-consent-heading">@HomeContent.CookieConsentHeading</h2>
+        <p>
+            @HomeContent.CookieConsentMessage
+            <a id="cookie-consent-privacy-link" href="/privacy">@HomeContent.CookieConsentPrivacyLinkText</a>.
+        </p>
+        <form method="post" action="/cookie-consent">
+            <input type="hidden" name="choice" value="accepted" />
+            <input type="hidden" name="returnUrl" value="@Model.ReturnUrl" />
+            <button type="submit">Accept</button>
+        </form>
+        <form method="post" action="/cookie-consent">
+            <input type="hidden" name="choice" value="declined" />
+            <input type="hidden" name="returnUrl" value="@Model.ReturnUrl" />
+            <button type="submit">Decline</button>
+        </form>
+    </section>
+}
+
 <section aria-labelledby="whatsnew-heading">
     <h2 id="whatsnew-heading">What's New</h2>
     <ul>

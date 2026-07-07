@@ -13,6 +13,14 @@ public class HomeContentTests
     }
 
     [Fact]
+    public void Cookie_consent_content_is_defined()
+    {
+        Assert.False(string.IsNullOrWhiteSpace(HomeContent.CookieConsentHeading));
+        Assert.False(string.IsNullOrWhiteSpace(HomeContent.CookieConsentMessage));
+        Assert.False(string.IsNullOrWhiteSpace(HomeContent.CookieConsentPrivacyLinkText));
+    }
+
+    [Fact]
     public void Highlights_are_listed()
     {
         Assert.NotEmpty(HomeContent.Highlights);

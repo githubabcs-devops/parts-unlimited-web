@@ -9,6 +9,11 @@ public static class HomeContent
     // User Story: "Update the home page hero banner text".
     public const string HeroBanner = "Welcome to Parts Unlimited - now powered by GitHub Copilot";
 
+    public const string CookieConsentCookieName = "parts-unlimited-cookie-consent";
+    public const string CookieConsentHeading = "Cookie Consent";
+    public const string CookieConsentMessage = "We use cookies to understand site traffic and remember your cookie preferences.";
+    public const string CookieConsentPrivacyLinkText = "Privacy Policy";
+
     // User Story: "Add a 'What's New' highlights section to the home page".
     public static readonly IReadOnlyList<string> Highlights = new[]
     {
@@ -18,4 +23,3 @@ public static class HomeContent
         "Automated CI/CD to Azure App Service across Dev, QA and Prod",
     };
 }
-
