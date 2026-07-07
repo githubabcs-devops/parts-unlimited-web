@@ -5,17 +5,143 @@
     ViewData["Title"] = "Home";
 }
 
-<section aria-labelledby="hero-heading">
-    <h1 id="hero-heading">@HomeContent.HeroBanner</h1>
-    <p>An end-to-end demo of moving from Azure DevOps to GitHub.</p>
+<style>
+    .hero {
+        background: linear-gradient(135deg, #14284b 0%, #0d1c36 100%);
+        color: #fff;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .hero::after {
+        content: "";
+        position: absolute;
+        right: -80px;
+        top: -80px;
+        width: 260px;
+        height: 260px;
+        background: radial-gradient(circle, rgba(255, 212, 0, 0.25) 0%, rgba(255, 212, 0, 0) 70%);
+    }
+
+    .hero .container { padding: 3.5rem 0; position: relative; z-index: 1; }
+
+    .hero .eyebrow {
+        display: inline-block;
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        color: #14284b;
+        background: var(--pu-gold);
+        padding: 0.35rem 0.75rem;
+        border-radius: 999px;
+        margin-bottom: 1rem;
+    }
+
+    .hero h1 {
+        margin: 0 0 0.75rem;
+        font-size: clamp(1.9rem, 4vw, 2.9rem);
+        line-height: 1.15;
+        max-width: 22ch;
+    }
+
+    .hero p {
+        margin: 0 0 1.75rem;
+        font-size: 1.1rem;
+        color: #cdd8ea;
+        max-width: 52ch;
+    }
+
+    .btn {
+        display: inline-block;
+        padding: 0.8rem 1.5rem;
+        border-radius: 10px;
+        font-weight: 700;
+        text-decoration: none;
+        transition: transform 0.05s ease, background 0.15s ease;
+    }
+
+    .btn-primary { background: var(--pu-gold); color: #14284b; }
+    .btn-primary:hover { background: var(--pu-gold-dark); }
+    .btn:active { transform: translateY(1px); }
+
+    .whatsnew { padding: 3rem 0 1rem; }
+
+    .section-head { margin-bottom: 1.75rem; }
+    .section-head h2 {
+        margin: 0 0 0.35rem;
+        font-size: 1.75rem;
+        color: var(--pu-navy);
+    }
+    .section-head p { margin: 0; color: var(--pu-muted); }
+
+    .cards {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        display: grid;
+        gap: 1.25rem;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    }
+
+    .card {
+        background: var(--pu-surface);
+        border: 1px solid var(--pu-border);
+        border-radius: var(--pu-radius);
+        box-shadow: var(--pu-shadow);
+        padding: 1.5rem;
+        position: relative;
+        padding-left: 1.5rem;
+        border-top: 3px solid var(--pu-gold);
+        transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 16px 40px rgba(20, 40, 75, 0.14);
+    }
+
+    .card .card-icon {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+        background: rgba(20, 40, 75, 0.06);
+        color: var(--pu-navy);
+        font-weight: 800;
+        margin-bottom: 0.85rem;
+    }
+
+    .card p { margin: 0; color: var(--pu-ink); }
+</style>
+
+<section class="hero" aria-labelledby="hero-heading">
+    <div class="container">
+        <span class="eyebrow">Parts Unlimited</span>
+        <h1 id="hero-heading">@HomeContent.HeroBanner</h1>
+        <p>An end-to-end demo of moving from Azure DevOps to GitHub.</p>
+        <a class="btn btn-primary" href="#whatsnew-heading">See what's new</a>
+    </div>
 </section>
 
-<section aria-labelledby="whatsnew-heading">
-    <h2 id="whatsnew-heading">What's New</h2>
-    <ul>
-        @foreach (var item in HomeContent.Highlights)
-        {
-            <li>@item</li>
-        }
-    </ul>
+<section class="whatsnew" aria-labelledby="whatsnew-heading">
+    <div class="container">
+        <div class="section-head">
+            <h2 id="whatsnew-heading">What's New</h2>
+            <p>The latest improvements powering the Parts Unlimited storefront.</p>
+        </div>
+        <ul class="cards">
+            @{ var index = 1; }
+            @foreach (var item in HomeContent.Highlights)
+            {
+                <li class="card">
+                    <span class="card-icon" aria-hidden="true">@index</span>
+                    <p>@item</p>
+                </li>
+                index++;
+            }
+        </ul>
+    </div>
 </section>

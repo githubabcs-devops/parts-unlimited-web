@@ -4,17 +4,143 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - Parts Unlimited</title>
+    <style>
+        :root {
+            --pu-navy: #14284b;
+            --pu-navy-deep: #0d1c36;
+            --pu-gold: #ffd400;
+            --pu-gold-dark: #e6bf00;
+            --pu-ink: #1f2937;
+            --pu-muted: #5b6472;
+            --pu-surface: #ffffff;
+            --pu-bg: #f5f7fa;
+            --pu-border: #e3e8ef;
+            --pu-radius: 14px;
+            --pu-shadow: 0 10px 30px rgba(20, 40, 75, 0.08);
+        }
+
+        * { box-sizing: border-box; }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            margin: 0;
+            font-family: "Segoe UI", system-ui, -apple-system, Roboto, Helvetica, Arial, sans-serif;
+            color: var(--pu-ink);
+            background: var(--pu-bg);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        a { color: var(--pu-navy); }
+
+        .site-header {
+            background: var(--pu-navy);
+            color: #fff;
+            border-bottom: 4px solid var(--pu-gold);
+        }
+
+        .site-header .container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+        }
+
+        .brand {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.65rem;
+            font-weight: 700;
+            font-size: 1.25rem;
+            color: #fff;
+            text-decoration: none;
+            letter-spacing: 0.2px;
+        }
+
+        .brand-mark {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            background: var(--pu-gold);
+            color: var(--pu-navy);
+            font-weight: 800;
+        }
+
+        .site-nav a {
+            color: #dbe4f3;
+            text-decoration: none;
+            margin-left: 1.4rem;
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        .site-nav a:hover { color: var(--pu-gold); }
+
+        .container {
+            width: min(1120px, 92vw);
+            margin: 0 auto;
+            padding: 1rem 0;
+        }
+
+        main { padding-bottom: 3rem; }
+
+        .footer {
+            background: var(--pu-navy-deep);
+            color: #b9c4d6;
+            border-top: 4px solid var(--pu-gold);
+        }
+
+        .footer .container {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.75rem;
+            padding: 1.5rem 0;
+            font-size: 0.9rem;
+        }
+
+        .footer a { color: #dbe4f3; text-decoration: none; }
+        .footer a:hover { color: var(--pu-gold); }
+
+        @@media (max-width: 640px) {
+            .site-header .container { flex-direction: column; align-items: flex-start; }
+            .site-nav a { margin-left: 0; margin-right: 1.2rem; }
+        }
+    </style>
 </head>
 <body>
+    <header class="site-header">
+        <div class="container">
+            <a class="brand" href="/">
+                <span class="brand-mark">PU</span>
+                <span>Parts Unlimited</span>
+            </a>
+            <nav class="site-nav" aria-label="Primary">
+                <a href="/">Home</a>
+                <a href="/privacy">Privacy</a>
+                <a href="/contact">Contact</a>
+            </nav>
+        </div>
+    </header>
+
     <main role="main">
         @RenderBody()
     </main>
-    <footer>
+
+    <footer class="footer">
         @* User Story: "Refresh the footer with the current year and key links" (year is dynamic). *@
-        <p>&copy; @DateTime.UtcNow.Year Parts Unlimited &middot;
-            <a href="/privacy">Privacy</a> &middot;
-            <a href="/contact">Contact</a>
-        </p>
+        <div class="container">
+            <span>&copy; @DateTime.UtcNow.Year Parts Unlimited</span>
+            <nav aria-label="Footer">
+                <a href="/privacy">Privacy</a> &middot;
+                <a href="/contact">Contact</a>
+            </nav>
+        </div>
     </footer>
 </body>
 </html>
