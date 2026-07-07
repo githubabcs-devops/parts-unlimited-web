@@ -133,14 +133,12 @@
             <p>The latest improvements powering the Parts Unlimited storefront.</p>
         </div>
         <ul class="cards">
-            @{ var index = 1; }
-            @foreach (var item in HomeContent.Highlights)
+            @for (var i = 0; i < HomeContent.Highlights.Count; i++)
             {
                 <li class="card">
-                    <span class="card-icon" aria-hidden="true">@index</span>
-                    <p>@item</p>
+                    <span class="card-icon" aria-hidden="true">@(i + 1)</span>
+                    <p>@HomeContent.Highlights[i]</p>
                 </li>
-                index++;
             }
         </ul>
     </div>
