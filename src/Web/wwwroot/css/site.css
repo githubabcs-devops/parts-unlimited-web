@@ -1,0 +1,22 @@
+.whats-new-list {
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.whats-new-item {
+    border: 1px solid CanvasText;
+    border-radius: 0.75rem;
+    padding: 1rem;
+}
+
+.whats-new-item h3 {
+    margin-top: 0;
+}
+
+.whats-new-item p {
+    margin-bottom: 0;
+}
