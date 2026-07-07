@@ -13,9 +13,9 @@ public class HomeContentTests
 
     // Demonstrates a test shipping alongside the home-page change (per the demo user stories).
     [Fact]
-    public void HeroBanner_is_not_empty()
+    public void HeroMessage_is_not_empty()
     {
-        Assert.False(string.IsNullOrWhiteSpace(HomeContent.HeroBanner));
+        Assert.False(string.IsNullOrWhiteSpace(HomeContent.HeroMessage));
     }
 
     [Fact]
