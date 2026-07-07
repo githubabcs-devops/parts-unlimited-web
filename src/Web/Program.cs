@@ -3,6 +3,7 @@ builder.Services.AddRazorPages();
 
 var app = builder.Build();
 
+app.UseStaticFiles();
 app.UseRouting();
 
 // User Story: "Add a health-check endpoint (/health)" — used by monitoring and the pipeline.
