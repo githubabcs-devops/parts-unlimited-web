@@ -1,0 +1,41 @@
+@page
+@model ContactModel
+@{
+    ViewData["Title"] = "Contact Us";
+}
+
+<section aria-labelledby="contact-heading">
+    <h1 id="contact-heading">Contact Us</h1>
+    <p>Have a question? Send us a message and our support team will get back to you.</p>
+
+    @if (Model.Submitted)
+    {
+        <p role="status" class="thank-you">Thank you for reaching out! We have received your message and will get back to you soon.</p>
+    }
+    else
+    {
+        <form method="post" novalidate>
+            <div asp-validation-summary="ModelOnly" role="alert"></div>
+
+            <div>
+                <label asp-for="Form.Name">Name</label>
+                <input asp-for="Form.Name" />
+                <span asp-validation-for="Form.Name"></span>
+            </div>
+
+            <div>
+                <label asp-for="Form.Email">Email</label>
+                <input asp-for="Form.Email" type="email" />
+                <span asp-validation-for="Form.Email"></span>
+            </div>
+
+            <div>
+                <label asp-for="Form.Message">Message</label>
+                <textarea asp-for="Form.Message" rows="5"></textarea>
+                <span asp-validation-for="Form.Message"></span>
+            </div>
+
+            <button type="submit">Send message</button>
+        </form>
+    }
+</section>
