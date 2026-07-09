@@ -24,3 +24,22 @@ public class HomeContentTests
         Assert.NotEmpty(HomeContent.Highlights);
     }
 }
+
+public class BuildInfoTests
+{
+    // AB#1659: /version2 returns the app version as JSON.
+    [Fact]
+    public void Version_is_not_empty()
+    {
+        Assert.False(string.IsNullOrWhiteSpace(BuildInfo.Version));
+    }
+
+    [Fact]
+    public void Current_exposes_service_and_version()
+    {
+        VersionInfo info = BuildInfo.Current;
+
+        Assert.Equal("parts-unlimited-web", info.Service);
+        Assert.Equal(BuildInfo.Version, info.Version);
+    }
+}

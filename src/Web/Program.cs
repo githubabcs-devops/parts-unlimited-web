@@ -1,3 +1,5 @@
+using GhAdoE2eDemo.Web;
+
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorPages();
 
@@ -12,6 +14,10 @@ app.MapGet("/health", () => Results.Json(new
     service = "gh-ado-e2e-demo",
     utc = DateTime.UtcNow
 }));
+
+// User Story (AB#1659): "/version2" returns the running build version so operators can
+// confirm what is deployed.
+app.MapGet("/version2", () => Results.Json(BuildInfo.Current));
 
 app.MapRazorPages();
 
