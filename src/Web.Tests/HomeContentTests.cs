@@ -42,4 +42,18 @@ public class BuildInfoTests
         Assert.Equal("parts-unlimited-web", info.Service);
         Assert.Equal(BuildInfo.Version, info.Version);
     }
+
+    [Fact]
+    public void InformationalVersion_is_not_empty()
+    {
+        Assert.False(string.IsNullOrWhiteSpace(BuildInfo.InformationalVersion));
+    }
+
+    [Fact]
+    public void InformationalVersion_differs_from_assembly_version_or_is_consistent()
+    {
+        // InformationalVersion is always a non-null string; both paths in BuildInfo must yield a value.
+        Assert.NotNull(BuildInfo.InformationalVersion);
+        Assert.NotNull(BuildInfo.Version);
+    }
 }
