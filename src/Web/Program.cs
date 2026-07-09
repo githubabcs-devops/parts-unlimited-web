@@ -15,6 +15,15 @@ app.MapGet("/health", () => Results.Json(new
     utc = DateTime.UtcNow
 }));
 
+// User Story: "Add a /health2 endpoint for monitoring" — used by uptime monitors.
+// Excluded from auth and returns a status body.
+app.MapGet("/health2", () => Results.Json(new
+{
+    status = "ok",
+    service = "gh-ado-e2e-demo",
+    utc = DateTime.UtcNow
+}));
+
 // User Story (AB#1659): "/version2" returns the running build version so operators can
 // confirm what is deployed.
 app.MapGet("/version2", () => Results.Json(BuildInfo.Current));
