@@ -1,4 +1,5 @@
 using GhAdoE2eDemo.Web;
+using Microsoft.AspNetCore.Mvc.Testing;
 using Xunit;
 
 namespace GhAdoE2eDemo.Web.Tests;
@@ -41,5 +42,28 @@ public class BuildInfoTests
 
         Assert.Equal("parts-unlimited-web", info.Service);
         Assert.Equal(BuildInfo.Version, info.Version);
+    }
+}
+
+public class Health3EndpointTests : IClassFixture<WebApplicationFactory<Program>>
+{
+    private readonly HttpClient _client;
+
+    public Health3EndpointTests(WebApplicationFactory<Program> factory)
+    {
+        _client = factory.CreateClient();
+    }
+
+    // AB#1661: GET /health3 must return 200 with a JSON body containing status = "ok".
+    [Fact]
+    public async Task Health3_returns_200_with_ok_status()
+    {
+        HttpResponseMessage response = await _client.GetAsync("/health3");
+
+        Assert.Equal(System.Net.HttpStatusCode.OK, response.StatusCode);
+
+        string body = await response.Content.ReadAsStringAsync();
+        Assert.Contains("\"status\"", body);
+        Assert.Contains("\"ok\"", body);
     }
 }

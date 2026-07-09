@@ -19,6 +19,9 @@ app.MapGet("/health", () => Results.Json(new
 // confirm what is deployed.
 app.MapGet("/version2", () => Results.Json(BuildInfo.Current));
 
+// AB#1661: /health3 — lightweight liveness probe for uptime monitors.
+app.MapGet("/health3", () => Results.Json(new { status = "ok" })).AllowAnonymous();
+
 app.MapRazorPages();
 
 app.Run();
