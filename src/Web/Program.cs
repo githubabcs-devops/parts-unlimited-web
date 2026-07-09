@@ -15,6 +15,13 @@ app.MapGet("/health", () => Results.Json(new
     utc = DateTime.UtcNow
 }));
 
+// GET /version — returns the assembly informational version as JSON.
+app.MapGet("/version", () => Results.Json(new
+{
+    service = "parts-unlimited-web",
+    version = BuildInfo.InformationalVersion
+}));
+
 // User Story (AB#1659): "/version2" returns the running build version so operators can
 // confirm what is deployed.
 app.MapGet("/version2", () => Results.Json(BuildInfo.Current));
