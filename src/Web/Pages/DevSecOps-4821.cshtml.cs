@@ -1,3 +1,4 @@
+using System;
 using System.Text.RegularExpressions;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
@@ -26,11 +27,10 @@ public class DevSecOps4821Model : PageModel
         // without sanitizing newlines, allowing forged/split log entries.
         _logger.LogInformation("DevSecOps demo page requested with query: " + q);
 
-        // INSECURE (ReDoS / CWE-1333): user-controlled input evaluated against a regular
-        // expression with catastrophic backtracking.
+        // Validate user-controlled input with a linear-time regex and explicit timeout.
         if (!string.IsNullOrEmpty(user))
         {
-            var validator = new Regex("^(([a-zA-Z0-9])+)+$");
+            var validator = new Regex("^[a-zA-Z0-9]+$", RegexOptions.CultureInvariant, TimeSpan.FromMilliseconds(250));
             IsValidUserName = validator.IsMatch(user);
             _logger.LogInformation("Validated user name '" + user + "': " + IsValidUserName);
         }
