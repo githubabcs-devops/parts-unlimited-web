@@ -33,6 +33,8 @@ public class LayoutNavigationTests
         Assert.Contains("max-height: 0;", layout);
         Assert.Contains("transition: max-height 0.2s ease, opacity 0.2s ease;", layout);
         Assert.Contains(".site-nav-links.is-open {", layout);
+        Assert.Contains("max-height: 80vh;", layout);
+        Assert.Contains("overflow-y: auto;", layout);
     }
 
     [Fact]
@@ -41,7 +43,20 @@ public class LayoutNavigationTests
         string layout = ReadLayout();
 
         Assert.Contains("document.addEventListener('keydown'", layout);
-        Assert.Contains("if (event.key === 'Escape')", layout);
+        Assert.Contains("if (event.key === 'Escape'", layout);
+        Assert.Contains("navMenu.classList.contains('is-open')", layout);
         Assert.Contains("navToggle.focus();", layout);
+    }
+
+    [Theory]
+    [InlineData("Privacy.cshtml")]
+    [InlineData("Contact.cshtml")]
+    public void Primary_navigation_links_have_backing_razor_pages(string pageFile)
+    {
+        string pagesDir = Path.GetFullPath("../../../../Web/Pages", AppContext.BaseDirectory);
+        string pagePath = Path.Combine(pagesDir, pageFile);
+
+        Assert.True(File.Exists(pagePath), $"Expected Razor page '{pageFile}' to exist so its navigation link does not 404.");
+        Assert.Contains("@page", File.ReadAllText(pagePath));
     }
 }

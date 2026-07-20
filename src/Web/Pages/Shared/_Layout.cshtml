@@ -109,8 +109,9 @@
             }
 
             .site-nav-links.is-open {
-                max-height: 12rem;
+                max-height: 80vh;
                 opacity: 1;
+                overflow-y: auto;
                 visibility: visible;
             }
         }
@@ -167,7 +168,7 @@
             });
 
             document.addEventListener('keydown', event => {
-                if (event.key === 'Escape') {
+                if (event.key === 'Escape' && navMenu.classList.contains('is-open')) {
                     closeMenu();
                     navToggle.focus();
                 }
