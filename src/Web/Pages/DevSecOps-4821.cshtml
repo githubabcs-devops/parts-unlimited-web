@@ -1,0 +1,32 @@
+@page
+@model DevSecOps4821Model
+@{
+    ViewData["Title"] = "DevSecOps & GitHub Advanced Security";
+}
+
+<section aria-labelledby="devsecops-heading">
+    <h1 id="devsecops-heading">DevSecOps with GitHub Advanced Security</h1>
+    <p>
+        The latest news and capabilities from GitHub Advanced Security (GHAS) that help teams
+        shift security left and ship with confidence.
+    </p>
+</section>
+
+<section aria-labelledby="ghas-news-heading">
+    <h2 id="ghas-news-heading">What's New in GitHub Advanced Security</h2>
+    <ul>
+        <li><strong>Copilot Autofix</strong> suggests one-click remediations for CodeQL alerts directly in pull requests.</li>
+        <li><strong>Secret scanning</strong> now offers push protection and validity checks for a growing catalog of providers.</li>
+        <li><strong>Dependabot</strong> surfaces vulnerable dependencies and opens automated version-bump pull requests.</li>
+        <li><strong>CodeQL</strong> adds faster analysis and expanded language and framework coverage.</li>
+        <li><strong>Security Overview</strong> gives org-wide risk and coverage dashboards for AppSec teams.</li>
+    </ul>
+</section>
+
+@if (!string.IsNullOrEmpty(Model.SearchTerm))
+{
+    <section aria-labelledby="search-heading">
+        <h2 id="search-heading">Search</h2>
+        <p>You searched for: @Model.SearchTerm</p>
+    </section>
+}
