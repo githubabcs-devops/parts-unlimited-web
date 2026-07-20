@@ -6,7 +6,7 @@ namespace GhAdoE2eDemo.Web.Tests;
 public class LayoutNavigationTests
 {
     private static readonly string LayoutPath = Path.GetFullPath(
-        Path.Combine(AppContext.BaseDirectory, "../../../../Web/Pages/Shared/_Layout.cshtml"));
+        "../../../../Web/Pages/Shared/_Layout.cshtml", AppContext.BaseDirectory);
 
     private static string ReadLayout() => File.ReadAllText(LayoutPath);
 
