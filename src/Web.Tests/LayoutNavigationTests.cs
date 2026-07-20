@@ -53,6 +53,9 @@ public class LayoutNavigationTests
     [InlineData("Contact.cshtml")]
     public void Primary_navigation_links_have_backing_razor_pages(string pageFile)
     {
+        if (Path.IsPathRooted(pageFile))
+            throw new ArgumentException($"pageFile must be a relative filename, not a rooted path: {pageFile}", nameof(pageFile));
+
         string pagesDir = Path.GetFullPath("../../../../Web/Pages", AppContext.BaseDirectory);
         string pagePath = Path.Combine(pagesDir, pageFile);
 
