@@ -7,21 +7,18 @@ var app = builder.Build();
 
 app.UseRouting();
 
-// User Story: "Add a health-check endpoint (/health)" — used by monitoring and the pipeline.
-app.MapGet("/health", () => Results.Json(new
+IResult HealthResponse() => Results.Json(new
 {
     status = "ok",
     service = "gh-ado-e2e-demo",
     utc = DateTime.UtcNow
-}));
+});
+
+// User Story: "Add a health-check endpoint (/health)" — used by monitoring and the pipeline.
+app.MapGet("/health", HealthResponse);
 
 // User Story: "Add a /health5 endpoint" — used by uptime monitors to check the app.
-app.MapGet("/health5", () => Results.Json(new
-{
-    status = "ok",
-    service = "gh-ado-e2e-demo",
-    utc = DateTime.UtcNow
-}));
+app.MapGet("/health5", HealthResponse);
 
 // GET /version — returns the assembly informational version as JSON.
 app.MapGet("/version", () => Results.Json(new

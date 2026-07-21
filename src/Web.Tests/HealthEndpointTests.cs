@@ -10,29 +10,30 @@ public class HealthEndpointTests(WebApplicationFactory<Program> factory)
 {
     private readonly HttpClient _client = factory.CreateClient();
 
-    [Fact]
-    public async Task Get_Health_Returns200()
+    [Theory]
+    [InlineData("/health")]
+    [InlineData("/health5")]
+    public async Task HealthEndpoints_Return200(string path)
     {
-        var response = await _client.GetAsync("/health");
+        var response = await _client.GetAsync(path);
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
     }
 
-    [Fact]
-    public async Task Get_Health5_Returns200()
+    [Theory]
+    [InlineData("/health")]
+    [InlineData("/health5")]
+    public async Task HealthEndpoints_ReturnExpectedPayload(string path)
     {
-        var response = await _client.GetAsync("/health5");
-
-        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-    }
-
-    [Fact]
-    public async Task Get_Health5_ReturnsStatusOk()
-    {
-        var response = await _client.GetAsync("/health5");
+        var response = await _client.GetAsync(path);
         var body = await response.Content.ReadAsStringAsync();
 
         using var doc = JsonDocument.Parse(body);
         Assert.Equal("ok", doc.RootElement.GetProperty("status").GetString());
+        Assert.Equal("gh-ado-e2e-demo", doc.RootElement.GetProperty("service").GetString());
+
+        var utcValue = doc.RootElement.GetProperty("utc").GetString();
+        Assert.False(string.IsNullOrWhiteSpace(utcValue));
+        Assert.True(DateTimeOffset.TryParse(utcValue, out _));
     }
 }
