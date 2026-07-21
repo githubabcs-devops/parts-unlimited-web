@@ -15,6 +15,14 @@ app.MapGet("/health", () => Results.Json(new
     utc = DateTime.UtcNow
 }));
 
+// User Story: "Add a /health5 endpoint" — used by uptime monitors to check the app.
+app.MapGet("/health5", () => Results.Json(new
+{
+    status = "ok",
+    service = "gh-ado-e2e-demo",
+    utc = DateTime.UtcNow
+}));
+
 // GET /version — returns the assembly informational version as JSON.
 app.MapGet("/version", () => Results.Json(new
 {

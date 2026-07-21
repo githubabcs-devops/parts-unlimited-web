@@ -19,9 +19,17 @@ public class HealthEndpointTests(WebApplicationFactory<Program> factory)
     }
 
     [Fact]
-    public async Task Get_Health_ReturnsStatusOk()
+    public async Task Get_Health5_Returns200()
     {
-        var response = await _client.GetAsync("/health");
+        var response = await _client.GetAsync("/health5");
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task Get_Health5_ReturnsStatusOk()
+    {
+        var response = await _client.GetAsync("/health5");
         var body = await response.Content.ReadAsStringAsync();
 
         using var doc = JsonDocument.Parse(body);
