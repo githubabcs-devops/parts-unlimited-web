@@ -15,7 +15,7 @@ public class HealthEndpointTests(WebApplicationFactory<Program> factory)
     [InlineData("/health5")]
     public async Task HealthEndpoints_Return200(string path)
     {
-        var response = await _client.GetAsync(path);
+        using var response = await _client.GetAsync(path);
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
     }
@@ -25,7 +25,10 @@ public class HealthEndpointTests(WebApplicationFactory<Program> factory)
     [InlineData("/health5")]
     public async Task HealthEndpoints_ReturnExpectedPayload(string path)
     {
-        var response = await _client.GetAsync(path);
+        using var response = await _client.GetAsync(path);
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.Equal("application/json", response.Content.Headers.ContentType?.MediaType);
+
         var body = await response.Content.ReadAsStringAsync();
 
         using var doc = JsonDocument.Parse(body);
