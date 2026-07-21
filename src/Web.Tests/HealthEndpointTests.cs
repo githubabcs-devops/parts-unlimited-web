@@ -27,4 +27,22 @@ public class HealthEndpointTests(WebApplicationFactory<Program> factory)
         using var doc = JsonDocument.Parse(body);
         Assert.Equal("ok", doc.RootElement.GetProperty("status").GetString());
     }
+
+    [Fact]
+    public async Task Get_Health6_Returns200()
+    {
+        var response = await _client.GetAsync("/health6");
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task Get_Health6_ReturnsStatusOk()
+    {
+        var response = await _client.GetAsync("/health6");
+        var body = await response.Content.ReadAsStringAsync();
+
+        using var doc = JsonDocument.Parse(body);
+        Assert.Equal("ok", doc.RootElement.GetProperty("status").GetString());
+    }
 }
