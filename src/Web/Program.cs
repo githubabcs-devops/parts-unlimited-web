@@ -26,6 +26,9 @@ app.MapGet("/version", () => Results.Json(new
 // confirm what is deployed.
 app.MapGet("/version2", () => Results.Json(BuildInfo.Current));
 
+// Simple version endpoint for deployed-instance verification.
+app.MapGet("/version3", () => Results.Json(BuildInfo.Current));
+
 app.MapRazorPages();
 
 app.Run();
