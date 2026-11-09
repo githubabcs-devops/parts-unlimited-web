@@ -1,9 +1,24 @@
 using GhAdoE2eDemo.Web;
+using Microsoft.AspNetCore.ResponseCompression;
+using System.IO.Compression;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorPages();
 
+// Performance: compress HTML/JSON responses (Brotli preferred, Gzip fallback) to cut
+// bandwidth and speed up page loads. Applies to the default set of text MIME types.
+builder.Services.AddResponseCompression(options =>
+{
+    options.EnableForHttps = true;
+    options.Providers.Add<BrotliCompressionProvider>();
+    options.Providers.Add<GzipCompressionProvider>();
+});
+builder.Services.Configure<BrotliCompressionProviderOptions>(o => o.Level = CompressionLevel.Fastest);
+builder.Services.Configure<GzipCompressionProviderOptions>(o => o.Level = CompressionLevel.Fastest);
+
 var app = builder.Build();
+
+app.UseResponseCompression();
 
 app.UseRouting();
 
