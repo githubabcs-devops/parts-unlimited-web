@@ -26,6 +26,8 @@ app.MapGet("/version", () => Results.Json(new
 // confirm what is deployed.
 app.MapGet("/version2", () => Results.Json(BuildInfo.Current));
 
+app.MapGet("/api/shipping/options", () => Results.Json(ShippingOptions.Demo));
+
 app.MapRazorPages();
 
 app.Run();
