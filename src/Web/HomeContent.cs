@@ -13,6 +13,7 @@ public static class HomeContent
     // User Story: "Add a 'What's New' highlights section to the home page".
     public static readonly IReadOnlyList<string> Highlights = new[]
     {
+        "Free shipping on orders over 100",
         "See the latest updates in the What is New section",
         "Migrated from Azure DevOps to GitHub with full history and pull requests",
         "AI-assisted code review on every pull request",
